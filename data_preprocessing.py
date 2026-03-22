@@ -14,15 +14,7 @@ BASE_SAVE_DIR = Path("./waste_processed")
 TARGET_SIZE = (128, 128)
 
 # in-distribution (ID) classes
-ID_CLASSES = {
-    "metal",
-    "glass",
-    "bio",
-    "paper",
-    "cardboard",
-    "plastic",
-    "clothes",
-}
+ID_CLASSES = {"metal","glass","bio","paper","plastic","clothes"}
 
 # Save format and quality
 SAVE_EXT = ".jpg"  
@@ -48,6 +40,19 @@ def get_image(row):
 def preprocess_image(img):
     return img.convert("RGB").resize(TARGET_SIZE)
 
+# merge shoes with clothes and paper with cardboard
+def map_label(label):
+    label = label.lower()
+
+    if label == "biological":
+        return "bio"
+    if label == "shoes":
+        return "clothes" 
+    if label == "cardboard":
+        return "paper"
+
+    return label
+
 # Output directories
 id_root = BASE_SAVE_DIR / "ID"
 ood_root = BASE_SAVE_DIR / "OOD"
@@ -57,9 +62,9 @@ ood_root.mkdir(parents=True, exist_ok=True)
 id_counts = {}
 ood_counts = {}
 
-# Process each image and save to the appropriate directory
+# Process each image and save to appropriate directory
 for row in tqdm(rows):
-    label = label_names[row["label"]]
+    label = map_label(label_names[row["label"]])
     img = preprocess_image(get_image(row))
 
     if label in ID_CLASSES:
@@ -72,5 +77,6 @@ for row in tqdm(rows):
         file_index = ood_counts[label]
 
     class_dir.mkdir(parents=True, exist_ok=True)
+
     filename = f"{label}_{file_index:06d}{SAVE_EXT}"
     img.save(class_dir / filename, quality=JPEG_QUALITY)
