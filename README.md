@@ -1,0 +1,2 @@
+### 1. Preprocessing data
+`preprocesing.py` downloads the waste classification dataset from Hugging Face (link: <https://huggingface.co/datasets/omasteam/waste-garbage-management-dataset>) and processes it. It resizes all images to the same size (128 x 128) and saves them as JPEG files into folders based on their class labels. Selected classes (metal, glass, bio, paper, cardboard, plastic, clothes) are saved as in-distribution (ID), while all other classes are saved as out-of-distribution (OOD).
